@@ -1,0 +1,134 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      #buttons {
+        left: 10px;
+        top: 0px;
+		float: left;
+		clear: both;
+      }
+      button {
+        margin-top: 10px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <div id="buttons">
+      <button id="save">
+        Save as image
+      </button>
+    </div>
+    <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v5.0.2.min.js"></script>
+    <script defer>
+      var stage = new Kinetic.Stage({
+    container: 'container',
+    width: 400,
+    height: 475
+});
+
+var layer = new Kinetic.Layer();
+stage.add(layer);
+
+//START BACKGROUND TREE
+
+var background = new Kinetic.Layer();
+
+      var imageObj = new Image();
+      imageObj.onload = function() {
+        var bgImage = new Kinetic.Image({
+          x: 0,
+          y: 0,
+          image: imageObj,
+          width: 400,
+          height: 475
+        });
+
+        // add the shape to the layer
+        background.add(bgImage);
+
+        // add the layer to the stage
+        stage.add(background);
+		layer.moveToBottom();
+		layer.setZIndex(1);
+      };
+      imageObj.src = 'https://dl.dropboxusercontent.com/s/4nfgxyhzelubl1z/tree.jpg';
+
+
+//END BACKGROUND TREE
+
+// put the paths to your images in imageURLs
+var imageURLs = [];
+imageURLs.push("https://dl.dropboxusercontent.com/s/9bgkgx41qkel8oo/apple.png");
+imageURLs.push("https://dl.dropboxusercontent.com/s/9bgkgx41qkel8oo/apple.png");
+imageURLs.push("https://dl.dropboxusercontent.com/s/9bgkgx41qkel8oo/apple.png");
+var imagesOK = 0;
+var imgs = [];
+
+// fully load every image, then call the start function
+loadAllImages(start);
+
+function loadAllImages(callback) {
+    for (var i = 0; i < imageURLs.length; i++) {
+        var img = new Image();
+        imgs.push(img);
+        img.onload = function () {
+            imagesOK++;
+            if (imagesOK >= imageURLs.length) {
+                callback();
+            }
+        };
+        img.onerror = function () {
+            alert("image load failed");
+        }
+        img.crossOrigin = "anonymous";
+        img.src = imageURLs[i];
+    }
+}
+
+function start() {
+    // the imgs[] array holds fully loaded images
+    // the imgs[] are in the same order as imageURLs[]
+
+    // make each image into a draggable Kinetic.Image
+    for (var i = 0; i < imgs.length; i++) {
+        var img = new Kinetic.Image({
+            x: i * 75 + 15,
+            y: i * 20 + 200,
+            width: 50,
+            height: 53,
+            image: imgs[i],
+            draggable: true
+        });
+        layer.add(img);
+    }
+    layer.draw();
+	layer.moveToTop();
+	layer.setZIndex(100);
+}
+
+
+      document.getElementById('save').addEventListener('click', function() {
+        /*
+         * since the stage toDataURL() method is asynchronous, we need
+         * to provide a callback
+         */
+        stage.toDataURL({
+		width: 800,
+        height: 566,
+        mimeType: "image/png",
+          callback: function(dataUrl) {
+            /*
+             * here you can do anything you like with the data url.
+             * In this tutorial we'll just open the url with the browser
+             * so that you can see the result as an image
+             */
+            window.open(dataUrl);
+          }
+        });
+      }, false);
+    </script>
+  </body>
+</html>      
